@@ -3,11 +3,12 @@ import { Query, ApolloConsumer, Mutation } from "react-apollo"
 import { gql } from 'apollo-boost'
 import Persons from './components/Persons'
 
-const allPersons = gql`
+const ALL_PERSONS = gql`
 {
   allPersons  {
     name
     phone
+    id
   }
 }
 `
@@ -16,7 +17,7 @@ const App = () => {
     <div>
       <ApolloConsumer>
         {(client => 
-          <Query query={allPersons}>
+          <Query query={ALL_PERSONS}>
             {(result) => <Persons result={result} client={client} />}
           </Query> 
         )}
