@@ -24,6 +24,7 @@ mutation createPerson($name: String!, $street: String!, $city: String!, $phone: 
   ) {
     name
     phone
+    id
     address {
       street
       city
