@@ -4,16 +4,17 @@ import { gql } from 'apollo-boost'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 
-const allPersons = gql`
+const ALL_PERSONS = gql`
 {
   allPersons  {
     name
     phone
+    id
   }
 }
 `
 
-const createPerson = gql`
+const CREATE_PERSON = gql`
 mutation createPerson($name: String!, $street: String!, $city: String!, $phone: String) {
   addPerson(
     name: $name,
@@ -27,6 +28,7 @@ mutation createPerson($name: String!, $street: String!, $city: String!, $phone: 
       street
       city
     }
+    id
   }
 }
 `
@@ -49,15 +51,16 @@ const App = () => {
         </div>
       }
       <ApolloConsumer>
-        {(client) => 
-          <Query query={allPersons}>
+        {client => 
+          <Query query={ALL_PERSONS} pollInterval={2000}>
             {(result) => <Persons result={result} client={client} />}
           </Query> 
         }
       </ApolloConsumer>
+      <h2>create new</h2>
       <Mutation
-        mutation={createPerson} 
-        refetchQueries={[{ query: allPersons }]}
+        mutation={CREATE_PERSON} 
+        refetchQueries={[{ query: ALL_PERSONS }]}
         onError={handleError}
       >
         {(addPerson) =>
