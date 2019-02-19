@@ -8,7 +8,9 @@ const PersonForm = (props) => {
 
   const submit = async (e) => {
     e.preventDefault()
-    await props.addUser({ variables: { name, phone, street, city } })
+    await props.addUser({ 
+      variables: { name, phone, street, city } 
+    })
 
     setName('')
     setPhone('')

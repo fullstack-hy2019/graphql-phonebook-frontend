@@ -1,11 +1,12 @@
 import React,  {useState } from 'react'
 import { gql } from 'apollo-boost'
 
-const findPerson = gql`
+const FIND_PERSON = gql`
 query findPersonByName($nameToSearch: String!) {
   findPerson(name: $nameToSearch) {
     name
-		phone 
+    phone 
+    id
 		address{
       street
       city
@@ -34,7 +35,7 @@ const Persons = ({ result, client }) => {
 
   const show = async (name) => {
     const { data } = await client.query({
-      query: findPerson,
+      query: FIND_PERSON,
       variables: { nameToSearch: name }
     })
     setPerson(data.findPerson)
