@@ -1,5 +1,6 @@
 import React,  {useState } from 'react'
 import { gql } from 'apollo-boost'
+import { useApolloClient } from 'react-apollo-hooks'
 
 const FIND_PERSON = gql`
 query findPersonByName($nameToSearch: String!) {
@@ -15,12 +16,14 @@ query findPersonByName($nameToSearch: String!) {
 }
 `
 
-const Persons = ({ result, client }) => {
+const Persons = ({ result }) => {
+  const client = useApolloClient()
+
+  const [person, setPerson] = useState(null)
+
   if (result.loading) {
     return <div>loading...</div>
   }
-
-  const [person, setPerson] = useState(null)
 
   if (person) {
     return(
