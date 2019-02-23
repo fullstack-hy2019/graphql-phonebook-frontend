@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 
 const PersonForm = (props) => {
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [street, setStreet] = useState('')
-  const [city, setCity] = useState('')
+  const [name, setName] = useState('teppo testaaja')
+  const [phone, setPhone] = useState('01-2123123')
+  const [street, setStreet] = useState('testitie')
+  const [city, setCity] = useState('Helsinki')
 
   const submit = async (e) => {
     e.preventDefault()

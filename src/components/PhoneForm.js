@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
 const PersonForm = (props) => {
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
+  const [name, setName] = useState('Pekka Mikkola')
+  const [phone, setPhone] = useState('040-12121')
 
   const submit = async (e) => {
     e.preventDefault()
