@@ -3,19 +3,32 @@ import { gql } from 'apollo-boost'
 import { useQuery, useMutation } from 'react-apollo-hooks' 
 import { useApolloClient } from 'react-apollo-hooks'
 
+import { Subscription } from 'react-apollo'
+
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import PhoneForm from './components/PhoneForm'
 import LoginForm from './components/LoginForm'
 
+const PERSON_DETAILS = gql`
+fragment PersonDetails on Person {
+  id
+  name
+  phone 
+  address {
+    street 
+    city
+  }
+}
+`
+
 const ALL_PERSONS = gql`
 {
   allPersons  {
-    name
-    phone
-    id
+    ...PersonDetails
   }
 }
+${PERSON_DETAILS}
 `
 
 const CREATE_PERSON = gql`
@@ -26,29 +39,19 @@ mutation createPerson($name: String!, $street: String!, $city: String!, $phone: 
     city: $city,
     phone: $phone
   ) {
-    name
-    phone
-    address {
-      street
-      city
-    }
-    id
+    ...PersonDetails
   }
 }
+${PERSON_DETAILS}
 `
 
 const EDIT_NUMBER = gql`
 mutation editNumber($name: String!, $phone: String!) {
   editNumber(name: $name, phone: $phone)  {
-    name
-    phone
-    address {
-      street
-      city
-    }
-    id
+    ...PersonDetails
   }
 }
+${PERSON_DETAILS}
 `
 
 const LOGIN = gql`
@@ -59,6 +62,15 @@ mutation login($username: String!, $password: String!) {
 }
 `
 
+const PERSON_ADDED = gql`
+subscription {
+  personAdded {
+    ...PersonDetails
+  }
+}
+${PERSON_DETAILS}
+`
+
 const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [token, setToken] = useState(null)
@@ -66,7 +78,7 @@ const App = () => {
   const client = useApolloClient()
 
   useEffect(() => {
-    setToken(localStorage.getItem('library-user-token', token))
+    setToken(localStorage.getItem('phonebook-user-token', token))
   }, [])
 
   const handleError = (error) => {
@@ -82,17 +94,31 @@ const App = () => {
     client.resetStore()
   }
 
+  const notify = (message) => {
+    setErrorMessage(message)
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 2000)
+  }
+
   const result = useQuery(ALL_PERSONS)
 
+  const includedIn = (set, object) => 
+    set.map(p => p.id).includes(object.id)  
+  
   const addPerson = useMutation(CREATE_PERSON, {
     onError: handleError,
     update: (store, response) => {
       const dataInStore = store.readQuery({ query: ALL_PERSONS })
-      dataInStore.allPersons.push(response.data.addPerson)
-      store.writeQuery({
-        query: ALL_PERSONS,
-        data: dataInStore
-      })
+      const addedPerson = response.data.addPerson
+      
+      if (!includedIn(dataInStore.allPersons, addedPerson)) {
+        dataInStore.allPersons.push(addedPerson)
+        client.writeQuery({
+          query: ALL_PERSONS,
+          data: dataInStore
+        })
+      }
     }
   })
 
@@ -132,6 +158,24 @@ const App = () => {
 
       <h2>change number</h2>
       <PhoneForm editNumber={editNumber} />    
+      <Subscription
+        subscription={PERSON_ADDED}
+        onSubscriptionData={({subscriptionData}) => {
+          const addedPerson = subscriptionData.data.personAdded
+          notify(`${addedPerson.name} added`)
+
+          const dataInStore = client.readQuery({ query: ALL_PERSONS })
+          if (!includedIn(dataInStore.allPersons, addedPerson)) {
+            dataInStore.allPersons.push(addedPerson)
+            client.writeQuery({
+              query: ALL_PERSONS,
+              data: dataInStore
+            })
+          }
+        }}
+      > 
+        {() => null}
+      </Subscription>
     </div>
   )
 }
