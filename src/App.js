@@ -162,6 +162,7 @@ const App = () => {
         subscription={PERSON_ADDED}
         onSubscriptionData={({subscriptionData}) => {
           const addedPerson = subscriptionData.data.personAdded
+ 
           notify(`${addedPerson.name} added`)
 
           const dataInStore = client.readQuery({ query: ALL_PERSONS })

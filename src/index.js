@@ -11,7 +11,6 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import { setContext } from 'apollo-link-context'
 
 import { split } from 'apollo-link'
-import { HttpLink } from 'apollo-link-http'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
 
@@ -51,7 +50,6 @@ const client = new ApolloClient({
   link,
   cache: new InMemoryCache()
 })
-
 
 ReactDOM.render(
   <ApolloProvider client={client}>
